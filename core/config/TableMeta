@@ -1,0 +1,5 @@
+MedicalRecord-medical_record_id
+Prescription-prescription_id
+Doctor-doctor_id
+Drug-drug_id
+Patient-patient_id

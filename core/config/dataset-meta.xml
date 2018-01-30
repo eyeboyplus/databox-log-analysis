@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>	
+    <dataset-name>甲状腺病例数据集</dataset-name>							<!-- 数据集名称 -->
+    <dataset-description>甲状腺病例相关数据集</dataset-description>
+    <table>
+		<table-name>diagnosis</table-name>                               <!-- 表名-->
+		<table-name-ch>诊断</table-name-ch>   
+		<table-size>100</table-size>
+		<pk>diagnosis_id</pk>											<!-- 主键描述-->
+			<fk>                                                             <!-- 外键描述-->
+				<fk-name>patient_id</fk-name>
+				<ref-table>Patient</ref-table>
+				<ref-field>patient_id</ref-field>
+			</fk>
+		<field>                                                          <!-- 字段描述 -->
+			<field-id>0</field-id>
+			<field-name>patient_id</field-name>
+			<field-name-ch>医疗卡号</field-name-ch>	     
+		</field>
+	</talbe>
+</dataset>

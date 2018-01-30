@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protection>
+	<data-protection>                                                   <!-- 直接访问保护 -->
+		<table-protection>                                              <!-- 表保护描述 -->
+			<table-name>diagnosis</table-name>                          <!-- 需保护的表名 -->
+			<table-size>10000</table-size>
+			<service-protection>                                        <!-- 指定接口 -->
+				<service-name>projections</service-name>
+				<safe-sg>0.01</safe-sg>
+	        </service-protection>
+            <field-protection>TSH,FT3</field-protection>              <!-- 表内字段保护描述 -->
+		</table-protection>
+    </data-protection>
+    <relation-protection>                                             <!-- 关联访问描述 -->
+		<relation>
+			<table>medical</table>
+			<table>doctor</table>
+		</relation>
+      </relation-protection>      
+</protection>
