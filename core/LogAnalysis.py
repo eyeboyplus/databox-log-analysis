@@ -89,8 +89,9 @@ class LogAnalysis:
         log_redis = LogRedis.LogRedis(log_redis_ip, log_redis_port,
                                       services_dict[service_name],
                                       col_name)
-        # 允许通过；redis计数
+        # 请求通过
         if res_flag and str(service_name) in services_dict.keys():
+            # 服务.表.记录 频次计数
             for pk in refDataList:
                 log_redis.increase_frequency(pk)
 
