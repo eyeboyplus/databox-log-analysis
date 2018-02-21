@@ -1,6 +1,7 @@
 from core import MedicalDataGraphEn, LogRedis
 from core import LogDatabase as logDB
 from core import HandledLog as hLog
+from core import Log
 
 import pymongo
 
@@ -20,6 +21,16 @@ services_dict = {
     'getDistinctValue': 9,
     'projections': 10
 }
+
+tableInfoDict = {'cc': ['medical_record_id', 'type', 'sex', 'age', 'name','cc_id','time','applicant'],
+                 'jyzb': ['jyzb_id','cc_id', 'jyzb_code', 'ref_range', 'res', 'item','tip'],
+                 'medical_record': ['medical_record_id','room', 'patient_id','ICD', 'time', 'doctor_id'],
+                 'patient': ['patient_id', 'name','sex','age','addr'],
+                 'doctor': ['doctor_id', 'name','sex','age','addr','room'],
+                 'prescription':['prescription_id','drug','medical_record_id','dose'],
+                 'jyzb_info': ['jyzb_code','jyzb_name','jyzb_ab','unit','male','female','baby'],
+                 'diagnosis': ['TSH', 'FT3', 'FT4']
+                 }
 
 log_redis_ip = '127.0.0.1'
 log_redis_port = 6379
@@ -91,14 +102,55 @@ class LogAnalysis:
                                       col_name)
         # 请求通过
         if res_flag and str(service_name) in services_dict.keys():
-            # 服务.表.记录 频次计数
             for pk in refDataList:
+                # 服务-表-记录 频次计数
                 log_redis.increase_frequency(pk)
+
+                # 更新字段访问详细数据
+                past_value = log_redis.get_detail_value(pk)
+                fields_binary_str = self.__fields_to_binary_string(col_name, field_list)
+                new_value = self.__string_or(past_value, fields_binary_str)
+                log_redis.update_detail_value(pk, new_value)
 
         log_redis.submit()
         return res
+
+    # 表的字段是否访问过，如果访问过则该字段至为1，否则为0
+    # 形如 110010
+    def __fields_to_binary_string(self, col, fields):
+        res = ""
+        for f in tableInfoDict[col]:
+            res += "1" if f in fields else "0"
+        return res
+
+    # return "11011" | "10010"
+    def __string_or(self, v1, v2):
+        if v1 is None or v1.strip() == b'':
+            if v2 is None or v2.strip() == b'':
+                return ''
+            else:
+                return v2
+        else:
+            if v2 is None or v2.strip() == b'':
+                return v1
+            else:
+                len1 = len(v1)
+                len2 = len(v2)
+                if len1 != len2:
+                    return ''
+                else:
+                    res = ''
+                    for i in range(len1):
+                        res += str(int(v1[i]) | int(v2[i]))
+                    return res
 
 
 if __name__ == '__main__':
     log_analysis = LogAnalysis()
     log_analysis.init()
+    log = Log.Log("{'serviceName':'getData', 'relCol':'diagnosis', 'relFields':['TSH'],"
+                  "'relDataList':['1','2'], 'fkList':[],'createdTime':'20180208'}")
+    print(log_analysis.analysis(log))
+    log = Log.Log("{'serviceName':'getData', 'relCol':'diagnosis', 'relFields':['FT4'],"
+                  "'relDataList':['1','2'], 'fkList':[],'createdTime':'20180208'}")
+    print(log_analysis.analysis(log))

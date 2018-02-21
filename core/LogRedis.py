@@ -11,7 +11,7 @@ class LogRedis:
         self.data_pipeline.hset(self.col_name + "_detail", pk, new_value)
 
     def get_detail_value(self, pk):
-        self.data_pipeline.hget(self.col_name + '_detail', pk)
+        return self.data_redis.hget(self.col_name + '_detail', pk)
 
     # redis中 db num 表示service name; HASH表示表名
     def increase_frequency(self, pk):
