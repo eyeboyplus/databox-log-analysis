@@ -17,5 +17,5 @@
 			<field-name>patient_id</field-name>
 			<field-name-ch>医疗卡号</field-name-ch>	     
 		</field>
-	</talbe>
+	</table>
 </dataset>

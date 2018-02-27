@@ -6,62 +6,57 @@ from bidict import bidict
 from core import XMLReader
 from core.databox_global import DataBoxGlobal
 
-sensitive_table_group = [
-    {'Doctor': ['doctor_id', 'doctor_name'],'Drug': ['drug_id','drug_name']}
-]
-
-tableInfoDict = {'cc': ['medical_record_id', 'type', 'sex', 'age', 'name','cc_id','time','applicant'],
-                 'jyzb':['jyzb_id','cc_id', 'jyzb_code', 'ref_range', 'res', 'item','tip'],
-                 'medical_record': ['medical_record_id','room', 'patient_id','ICD', 'time', 'doctor_id'],
-                 'patient': ['patient_id', 'name','sex','age','addr'],
-                 'doctor': ['doctor_id', 'name','sex','age','addr','room'],
-                 'prescription':['prescription_id','drug','medical_record_id','dose'],
-                 'jyzb_info': ['jyzb_code','jyzb_name','jyzb_ab','unit','male','female','baby'],
-                 'diagnosis' : ['TSH', 'FT3', 'FT4']
-                 }
-
-tablePKDict = {
-                 'cc': "cc_id",
-                 'jyzb':"jyzb_id",
-                 'medical_record': "medical_record_id",
-                 'patient':"patient_id",
-                 'doctor': "doctor_id",
-                 'prescription':"prescription_id",
-                 'diagnosis': 'TSH'
-}
-
-tableFkDict = [
-    ['doctor', 'medical_record', 'doctor_id'],
-    ['medical_record', 'patient', 'patient_id'],
-    ['medical_record', 'prescription', 'medical_record_id'],
-    ['cc', 'patient', 'medical_record_id'],
-    ['jyzb', 'cc', 'cc_id']
-]
+# tableInfoDict = {'cc': ['medical_record_id', 'type', 'sex', 'age', 'name','cc_id','time','applicant'],
+#                  'jyzb':['jyzb_id','cc_id', 'jyzb_code', 'ref_range', 'res', 'item','tip'],
+#                  'medical_record': ['medical_record_id','room', 'patient_id','ICD', 'time', 'doctor_id'],
+#                  'patient': ['patient_id', 'name','sex','age','addr'],
+#                  'doctor': ['doctor_id', 'name','sex','age','addr','room'],
+#                  'prescription':['prescription_id','drug','medical_record_id','dose'],
+#                  'jyzb_info': ['jyzb_code','jyzb_name','jyzb_ab','unit','male','female','baby'],
+#                  'diagnosis' : ['TSH', 'FT3', 'FT4']
+#                  }
+#
+# tablePKDict = {
+#                  'cc': "cc_id",
+#                  'jyzb':"jyzb_id",
+#                  'medical_record': "medical_record_id",
+#                  'patient':"patient_id",
+#                  'doctor': "doctor_id",
+#                  'prescription':"prescription_id",
+#                  'diagnosis': 'TSH'
+# }
+#
+# tableFkDict = [
+#     ['doctor', 'medical_record', 'doctor_id'],
+#     ['medical_record', 'patient', 'patient_id'],
+#     ['medical_record', 'prescription', 'medical_record_id'],
+#     ['cc', 'patient', 'medical_record_id'],
+#     ['jyzb', 'cc', 'cc_id']
+# ]
 
 
 databox = DataBoxGlobal()
-table_meta = databox.get_relative_path('conf/DataMeta.xml')
-relation_meta = databox.get_relative_path('conf/RelationMeta')
-sensitive_meta = databox.get_relative_path('conf/Protection.xml')
+# table_meta = databox.get_relative_path('conf/DataMeta.xml')
+# relation_meta = databox.get_relative_path('conf/RelationMeta')
+# sensitive_meta = databox.get_relative_path('conf/Protection.xml')
 
 
 class MedicalDataGraph:
-    def __init__(self,sensitive_meta=sensitive_meta):
+    def __init__(self, tableInfoDict, tablePKDict, tableFKDict, relationProtectionList):
         self.G = nx.Graph()
-        self.__info_initial()
+        self.__info_initial(tableInfoDict, tablePKDict, tableFKDict)
         nx.connected_components(self.G)
-        self.__sensitive_meta_initial(sensitive_meta)
+        self.__sensitive_meta_initial(relationProtectionList)
 
-    def __info_initial(self):
+    def __info_initial(self, tableInfoDict, tablePKDict, tableFKDict):
         for t in tablePKDict.keys():
             self.G.add_node(t, pk=tablePKDict[t],fields=tableInfoDict[t])
-        for f in tableFkDict:
+        for f in tableFKDict:
             self.G.add_edge(f[0],f[1],fk=f[2])
 
-    def __sensitive_meta_initial(self, protection):
-        relation_meta = XMLReader.parse_protection(protection)['relation_protections']
+    def __sensitive_meta_initial(self, relationProtectionList):
         self.STG = []
-        for relation in relation_meta:
+        for relation in relationProtectionList:
             self.STG.append((relation[0],relation[1]))
 
     # 给出两个节点中的所有路径

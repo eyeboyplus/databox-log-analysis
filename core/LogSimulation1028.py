@@ -72,7 +72,7 @@ tablePKDict = {
                  '用药':"用药流水号",
 }
 
-redis_name_dict = get_db_conf('../file/config')
+redis_name_dict = get_db_conf('../file/conf')
 # def generate1026():
 #     prescInfo = getTable("诊断",{"ICD名称":{"$in":["甲状腺机能亢进", "甲状腺恶性肿瘤",  "甲状腺炎"]}},{"就诊流水号":1,"医疗卡号":1,"医生工号":1},False)
 #     # patientInfo = getTable("诊断",{"医疗卡号":1},True)

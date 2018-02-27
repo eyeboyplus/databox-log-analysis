@@ -61,7 +61,7 @@ tablePKDict = {
                  'prescription':"prescription_id",
 }
 
-redis_name_dict = get_db_conf('../file/config')
+redis_name_dict = get_db_conf('../file/conf')
 
 
 '''

@@ -1,13 +1,11 @@
-from core import MedicalDataGraphEn, LogRedis
+from core import MedicalDataGraph, LogRedis
 from core import LogDatabase as logDB
 from core import HandledLog as hLog
 from core import Log
+from core.databox_global import DataBoxGlobal
+from core import DatasetMetaXmlReader, ProtectionXmlReader
 
 import pymongo
-
-service_names = ['getData', 'getAllValue', 'getAverage', 'getConditionCount',
-                 'dataCount', 'getFilterData', 'getMax', 'getMin',
-                 'getDistinctValue', 'projections']
 
 services_dict = {
     'getData': 1,
@@ -22,15 +20,15 @@ services_dict = {
     'projections': 10
 }
 
-tableInfoDict = {'cc': ['medical_record_id', 'type', 'sex', 'age', 'name','cc_id','time','applicant'],
-                 'jyzb': ['jyzb_id','cc_id', 'jyzb_code', 'ref_range', 'res', 'item','tip'],
-                 'medical_record': ['medical_record_id','room', 'patient_id','ICD', 'time', 'doctor_id'],
-                 'patient': ['patient_id', 'name','sex','age','addr'],
-                 'doctor': ['doctor_id', 'name','sex','age','addr','room'],
-                 'prescription':['prescription_id','drug','medical_record_id','dose'],
-                 'jyzb_info': ['jyzb_code','jyzb_name','jyzb_ab','unit','male','female','baby'],
-                 'diagnosis': ['TSH', 'FT3', 'FT4']
-                 }
+databox = DataBoxGlobal()
+dataset_meta_path = databox.get_relative_path('conf/dataset-meta.xml')
+protection_path = databox.get_relative_path('conf/protection.xml')
+datasetMetaReader = DatasetMetaXmlReader.DatasetMetaXmlReader(dataset_meta_path)
+protectionXmlReader = ProtectionXmlReader.ProtectionXmlReader(protection_path)
+tableInfoDict = datasetMetaReader.getTableInfoDict()
+tablePKDict = datasetMetaReader.getTablePkDict()
+tableFKDict = datasetMetaReader.getTableFkDict()
+relationProtectionList = protectionXmlReader.getRelationProtectionList()
 
 log_redis_ip = '127.0.0.1'
 log_redis_port = 6379
@@ -42,7 +40,10 @@ sensitive_table_internal = {
 
 class LogAnalysis:
     def __init__(self):
-        self.table_graph = MedicalDataGraphEn.MedicalDataGraph()
+        self.table_graph = MedicalDataGraph.MedicalDataGraph(tableInfoDict=tableInfoDict,
+                                                             tablePKDict=tablePKDict,
+                                                             tableFKDict=tableFKDict,
+                                                             relationProtectionList=relationProtectionList)
         self.log_db = logDB.LogConfDatabase('127.0.0.1', 27017, 'LogCase')
 
     def init(self):

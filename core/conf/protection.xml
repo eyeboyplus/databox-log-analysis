@@ -13,8 +13,8 @@
     </data-protection>
     <relation-protection>                                             <!-- 关联访问描述 -->
 		<relation>
-			<table>medical_record</table>
-			<table>doctor</table>
+			<table>Patient</table>
+			<table>diagnosis</table>
 		</relation>
       </relation-protection>      
 </protection>

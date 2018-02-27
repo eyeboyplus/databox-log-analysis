@@ -13,10 +13,10 @@ from core import MedicalDataGraphEn
 
 # on docker
 databox = DataBoxGlobal()
-config_path = databox.get_relative_path('config/config')
+config_path = databox.get_relative_path('conf/conf')
 localhost = '127.0.0.1'
 # on my pc
-# config_path = './file/config'
+# config_path = './file/conf'
 # localhost = '127.0.0.1'
 mongo_db_name = 'LogCaseEn'
 # 设置相似序列数组重复度
